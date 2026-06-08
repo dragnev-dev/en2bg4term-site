@@ -1,0 +1,6 @@
+# Generated at build time — never committed.
+/public/
+/resources/
+/data/terms.json
+.hugo_build.lock
+/node_modules/

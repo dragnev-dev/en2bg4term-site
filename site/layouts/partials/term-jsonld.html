@@ -1,0 +1,15 @@
+{{- /* DefinedTerm structured data for a single term page. */ -}}
+{{- $data := dict
+    "@context" "https://schema.org"
+    "@type" "DefinedTerm"
+    "name" .Title
+    "description" .Params.bg_raw
+    "url" .Permalink
+    "inLanguage" "en"
+    "inDefinedTermSet" (dict
+        "@type" "DefinedTermSet"
+        "name" site.Title
+        "url" (site.Home.Permalink)
+    )
+-}}
+<script type="application/ld+json">{{ $data | jsonify | safeJS }}</script>

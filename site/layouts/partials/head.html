@@ -1,0 +1,20 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{{- $title := cond .IsHome site.Title (printf "%s — %s" .Title site.Title) -}}
+<title>{{ $title }}</title>
+{{- $desc := site.Params.description -}}
+{{- if and (not .IsHome) .Params.bg_raw -}}
+{{- $desc = printf "Превод на %s на български: %s. Речник с грижливо подбирани преводи на често срещани понятия." .Title .Params.bg_raw -}}
+{{- end -}}
+<meta name="description" content="{{ $desc | truncate 160 }}">
+<link rel="canonical" href="{{ .Permalink }}">
+<meta property="og:title" content="{{ $title }}">
+<meta property="og:description" content="{{ $desc | truncate 160 }}">
+<meta property="og:type" content="{{ cond .IsHome "website" "article" }}">
+<meta property="og:url" content="{{ .Permalink }}">
+{{- with resources.Get "css/site.css" }}
+  {{- $css := . | minify | fingerprint -}}
+  <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+{{- end }}
+<link href="{{ "pagefind/pagefind-ui.css" | relURL }}" rel="stylesheet">
+<script>document.documentElement.classList.remove('no-js');</script>

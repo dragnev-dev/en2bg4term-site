@@ -1,0 +1,9 @@
+{{ define "main" }}
+<div id="content">
+    <nav id="az-nav" aria-label="Указател по буква">
+        {{ range hugo.Data.terms.letters }}
+        <a href="{{ printf "terms/#letter-%s" (urlize .) | relURL }}">{{ . }}</a>
+        {{ end }}
+    </nav>
+</div>
+{{ end }}

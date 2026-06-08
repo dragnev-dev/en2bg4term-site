@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html class="no-js" lang="bg">
+<head>
+    {{ partial "head.html" . }}
+    {{ block "head" . }}{{ end }}
+</head>
+<body>
+    <a class="skip-link" href="#main">Към съдържанието</a>
+    {{ partial "site-header.html" . }}
+    <main id="main">
+        {{ block "main" . }}{{ end }}
+    </main>
+    <footer>
+        <nav aria-label="Долна навигация">
+            <a href="{{ site.Home.RelPermalink }}">Начало</a> ·
+            <a href="{{ site.Params.github }}/issues">Казуси</a>
+        </nav>
+        <p>Проект с отворен код. Включете се като участвате и вие.</p>
+    </footer>
+    {{ partial "search-init.html" . }}
+    {{ block "scripts" . }}{{ end }}
+</body>
+</html>

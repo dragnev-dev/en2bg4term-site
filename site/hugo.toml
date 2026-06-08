@@ -1,0 +1,24 @@
+baseURL = "https://dragnev-dev.github.io/en2bg4term-site/"
+defaultContentLanguage = "bg"
+title = "EN2BGTERM"
+enableRobotsTXT = true
+
+# This site has no tags/categories — drop the default taxonomies.
+disableKinds = ["taxonomy", "term"]
+
+[params]
+  description = "Превод на терминология в контекста на информационните технологии — английско-български речник."
+  description_suffix = "Речник с грижливо подбирани преводи на често срещани понятия."
+  github = "https://github.com/stelf/en2bg4term/"
+
+[sitemap]
+  changefreq = "monthly"
+  priority = 0.5
+
+[markup.goldmark.renderer]
+  unsafe = true  # allow inline HTML in markdownified comments/examples
+
+[outputs]
+  home = ["HTML"]
+  section = ["HTML"]
+  page = ["HTML"]

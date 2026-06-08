@@ -1,0 +1,36 @@
+{{ define "main" }}
+<article class="term" data-pagefind-body lang="bg">
+    <p class="breadcrumb" data-pagefind-ignore>
+        <a href="{{ "terms/" | relURL }}">Термини</a> /
+        <a href="{{ printf "terms/#letter-%s" (urlize .Params.letter) | relURL }}">{{ .Params.letter }}</a>
+    </p>
+
+    <h1 class="term-en" lang="en">{{ .Params.en_md | markdownify }}</h1>
+
+    <dl class="term-def">
+        <dt data-pagefind-ignore>Превод на български</dt>
+        <dd lang="bg">{{ .Params.bg_md | markdownify }}</dd>
+    </dl>
+
+    {{ with .Params.comment_md }}
+    <section class="term-comment" aria-label="Забележка">
+        <h2>Забележка</h2>
+        <div>{{ . | markdownify }}</div>
+    </section>
+    {{ end }}
+
+    {{ with .Params.examples }}
+    <section class="term-examples" aria-label="Примери за употреба">
+        <h2>Примери за употреба</h2>
+        {{ range . }}
+        <div class="example">
+            {{ with .en }}<p class="example-en" lang="en">{{ . | markdownify }}</p>{{ end }}
+            {{ range .bg }}<p class="example-bg" lang="bg">{{ . | markdownify }}</p>{{ end }}
+        </div>
+        {{ end }}
+    </section>
+    {{ end }}
+
+    {{ partial "term-jsonld.html" . }}
+</article>
+{{ end }}

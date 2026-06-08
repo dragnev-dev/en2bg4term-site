@@ -1,0 +1,72 @@
+{{ define "main" }}
+<div class="terms-index" data-letter-filter>
+    <h1>Указател</h1>
+    <nav id="az-nav" aria-label="Указател по буква">
+        {{ range hugo.Data.terms.letters }}
+        <a href="#letter-{{ urlize . }}" data-letter="{{ urlize . }}">{{ . }}</a>
+        {{ end }}
+    </nav>
+
+    {{ range $letter := hugo.Data.terms.letters }}
+    <section class="letter-group" id="letter-{{ urlize $letter }}" aria-labelledby="letter-{{ urlize $letter }}-h">
+        <h2 id="letter-{{ urlize $letter }}-h">{{ $letter }}</h2>
+        <ul class="term-list">
+            {{ range where hugo.Data.terms.terms "letter" $letter }}
+            <li>
+                <a href="{{ printf "terms/%s/" .slug | relURL }}">
+                    <span class="t-en" lang="en">{{ .en_raw }}</span>
+                    <span class="t-sep">—</span>
+                    <span class="t-bg" lang="bg">{{ .bg_raw }}</span>
+                </a>
+            </li>
+            {{ end }}
+        </ul>
+    </section>
+    {{ end }}
+</div>
+{{ end }}
+
+{{ define "scripts" }}
+<script>
+(function () {
+    var root = document.querySelector('[data-letter-filter]');
+    if (!root) return;
+    var groups = root.querySelectorAll('.letter-group');
+    var links = root.querySelectorAll('#az-nav a[data-letter]');
+    if (!groups.length) return;
+
+    // Enable single-letter mode (no-JS keeps every group visible).
+    root.classList.add('js-filtered');
+
+    function letterFromHash() {
+        var h = (location.hash || '').replace(/^#letter-/, '');
+        return h || groups[0].id.replace(/^letter-/, '');
+    }
+
+    function activate(letter) {
+        var matched = false;
+        groups.forEach(function (g) {
+            var on = g.id === 'letter-' + letter;
+            g.classList.toggle('is-active', on);
+            if (on) matched = true;
+        });
+        // Unknown hash → fall back to the first group.
+        if (!matched) {
+            letter = groups[0].id.replace(/^letter-/, '');
+            groups[0].classList.add('is-active');
+        }
+        links.forEach(function (a) {
+            var on = a.getAttribute('data-letter') === letter;
+            a.classList.toggle('is-current', on);
+            if (on) { a.setAttribute('aria-current', 'true'); }
+            else { a.removeAttribute('aria-current'); }
+        });
+    }
+
+    activate(letterFromHash());
+    window.addEventListener('hashchange', function () {
+        activate(letterFromHash());
+    });
+})();
+</script>
+{{ end }}

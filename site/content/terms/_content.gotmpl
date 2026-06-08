@@ -1,0 +1,18 @@
+{{/* Content adapter: emit one page per dictionary term from data/terms.json. */}}
+{{ $data := hugo.Data.terms }}
+{{ range $data.terms }}
+  {{ $page := dict
+      "path" .slug
+      "title" .en_raw
+      "kind" "page"
+      "params" (dict
+          "en_md"      .en_md
+          "bg_md"      .bg_md
+          "bg_raw"     .bg_raw
+          "comment_md" .comment_md
+          "examples"   .examples
+          "letter"     .letter
+      )
+  }}
+  {{ $.AddPage $page }}
+{{ end }}

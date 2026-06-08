@@ -1,0 +1,19 @@
+{{- /* Global header: logo, slogan and search on every page.
+       On the home page the brand is the page <h1>; elsewhere it is a link
+       back home so each term page keeps a single, term-specific <h1>. */ -}}
+<header class="site-header{{ if .IsHome }} is-home{{ end }}">
+    <a id="github-link" href="{{ site.Params.github }}" target="_blank" rel="noopener"
+       aria-label="Хранилище в GitHub">
+        <img src="{{ "img/github-64px.png" | relURL }}" alt="GitHub" width="64" height="64">
+    </a>
+    {{ if .IsHome }}
+    <h1 id="main-title"><span id="en-flag" lang="en">EN</span>2<span id="bg-flag">BG</span>TERM</h1>
+    {{ else }}
+    <a id="main-title" href="{{ site.Home.RelPermalink }}" aria-label="EN2BGTERM — начало"><span id="en-flag" lang="en">EN</span>2<span id="bg-flag">BG</span>TERM</a>
+    {{ end }}
+    <p id="sub-title">Превод на терминология в контекста на информационните технологии</p>
+    <p id="search-label">Въведете английски термин:</p>
+    <div id="search-holder">
+        <div id="search" role="search" aria-label="Търсене на термин"></div>
+    </div>
+</header>

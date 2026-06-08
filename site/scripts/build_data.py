@@ -1,0 +1,156 @@
+#!/usr/bin/env python3
+"""Parse README.md + examples.md into site/data/terms.json for Hugo.
+Source files are read from $DICT_SRC / $EXAMPLES_SRC (local paths or URLs).
+Stdlib only.
+"""
+
+import json
+import os
+import re
+import sys
+import urllib.request
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+SITE_DIR = HERE.parent
+REPO_ROOT = SITE_DIR.parent
+
+DICT_SRC = os.environ.get("DICT_SRC", str(REPO_ROOT / "README.md"))
+EXAMPLES_SRC = os.environ.get("EXAMPLES_SRC", str(REPO_ROOT / "examples.md"))
+OUT = SITE_DIR / "data" / "terms.json"
+
+LINK_RE = re.compile(r"\[([^\]]*)\]\([^)]*\)")          # [label](url) -> label
+PREFIX_RE = re.compile(r"^\((?:to|an|a)\)\s+", re.I)    # leading (to)/(an)/(a)
+PAREN_RE = re.compile(r"\([^)]*\)")                     # parenthetical clarifiers
+SECTION_RE = re.compile(r"^###\s+(.+?)\s*$")            # dictionary letter header
+EX_SECTION_RE = re.compile(r"^##\s+(.+?)\s*$")          # examples letter header
+EX_TERM_RE = re.compile(r"^\*\s+\*\*(.+?)\*\*")         # *   **term** (...)
+EX_LINE_RE = re.compile(r"^\s*\*\s+(EN|BG):\s*(.+?)\s*$")
+
+# Header / separator rows to skip (cf. excapeWordArray in js/site.js).
+SKIP_CELL = {"en", "bg", "забележка", "коментар", ""}
+
+
+def read_source(src: str) -> str:
+    if src.startswith(("http://", "https://")):
+        with urllib.request.urlopen(src, timeout=30) as resp:
+            return resp.read().decode("utf-8")
+    return Path(src).read_text(encoding="utf-8")
+
+
+def strip_links(text: str) -> str:
+    return LINK_RE.sub(r"\1", text)
+
+
+def slugify(en_text: str) -> str:
+    """English term -> URL slug. Strips links, (to)/(an)/(a), parentheticals."""
+    s = strip_links(en_text)
+    s = PREFIX_RE.sub("", s)
+    s = PAREN_RE.sub("", s)
+    s = s.lower()
+    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
+    return s or "term"
+
+
+def join_key(text: str) -> str:
+    """Normalized key for matching dictionary terms to example blocks."""
+    return re.sub(r"\s+", " ", strip_links(text).strip()).lower()
+
+
+def parse_examples(text: str) -> dict:
+    """Return {join_key: [{"en": str, "bg": [str, ...]}, ...]}."""
+    out: dict[str, list] = {}
+    current = None  # current example dict being filled
+    key = None
+    for line in text.splitlines():
+        m = EX_TERM_RE.match(line)
+        if m:
+            key = join_key(m.group(1))
+            current = {"en": "", "bg": []}
+            out.setdefault(key, []).append(current)
+            continue
+        if current is None:
+            continue
+        m = EX_LINE_RE.match(line)
+        if m:
+            kind, val = m.group(1), m.group(2)
+            if kind == "EN":
+                current["en"] = val
+            else:
+                current["bg"].append(val)
+    # Drop empty shells.
+    for k in list(out):
+        out[k] = [e for e in out[k] if e["en"] or e["bg"]]
+        if not out[k]:
+            del out[k]
+    return out
+
+
+def parse_dictionary(text: str, examples: dict):
+    terms = []
+    letters = []
+    seen_slugs: dict[str, int] = {}
+    current_letter = None
+
+    for raw in text.splitlines():
+        sec = SECTION_RE.match(raw)
+        if sec:
+            current_letter = sec.group(1).strip()
+            letters.append(current_letter)
+            continue
+        if current_letter is None or "|" not in raw:
+            continue
+
+        cells = [c.strip() for c in raw.strip().strip("|").split("|")]
+        if len(cells) < 2:
+            continue
+        en_md, bg_md = cells[0], cells[1]
+        comment_md = cells[2] if len(cells) > 2 else ""
+
+        # Skip table header / separator rows.
+        if en_md.lower() in SKIP_CELL or set(en_md) <= set("-: "):
+            continue
+        if not en_md or not bg_md:
+            continue
+
+        en_raw = strip_links(en_md).strip()
+        bg_raw = strip_links(bg_md).strip()
+
+        base = slugify(en_md)
+        n = seen_slugs.get(base, 0) + 1
+        seen_slugs[base] = n
+        slug = base if n == 1 else f"{base}-{n}"
+
+        terms.append({
+            "slug": slug,
+            "letter": current_letter,
+            "en_raw": en_raw,
+            "en_md": en_md,
+            "bg_raw": bg_raw,
+            "bg_md": bg_md,
+            "comment_md": comment_md,
+            "examples": examples.get(join_key(en_md), []),
+        })
+
+    return terms, letters
+
+
+def main():
+    dict_text = read_source(DICT_SRC)
+    ex_text = read_source(EXAMPLES_SRC)
+    examples = parse_examples(ex_text)
+    terms, letters = parse_dictionary(dict_text, examples)
+
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    payload = {"letters": letters, "terms": terms}
+    OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    matched = sum(1 for t in terms if t["examples"])
+    print(f"terms: {len(terms)}  letters: {len(letters)}  with-examples: {matched}")
+    print(f"example keys: {len(examples)}  unmatched: "
+          f"{len(examples) - len({join_key(t['en_md']) for t in terms if t['examples']})}")
+    print(f"wrote {OUT}")
+
+
+if __name__ == "__main__":
+    sys.exit(main())

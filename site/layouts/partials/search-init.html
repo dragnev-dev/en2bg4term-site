@@ -1,0 +1,27 @@
+{{- /* Boots the global Pagefind UI in the #search box rendered by site-header. */ -}}
+<script src="{{ "pagefind/pagefind-ui.js" | relURL }}"></script>
+<script>
+    window.addEventListener('DOMContentLoaded', function () {
+        new PagefindUI({
+            element: "#search",
+            showImages: false,
+            showSubResults: true,
+            translations: {
+                placeholder: "Търсене на термин",
+                clear_search: "Изчисти",
+                load_more: "Покажи още",
+                search_label: "Търсене на термин",
+                zero_results: "Няма резултати за [SEARCH_TERM]",
+                many_results: "[COUNT] резултата за [SEARCH_TERM]",
+                one_result: "[COUNT] резултат за [SEARCH_TERM]",
+                searching: "Търсене на [SEARCH_TERM]…"
+            }
+        });
+        var input = document.querySelector('#search input');
+        if (input) {
+            input.setAttribute('aria-label', 'Търсене на термин');
+            {{ if .IsHome }}// Focus only on the landing page so term pages don't steal focus.
+            input.focus();{{ end }}
+        }
+    });
+</script>

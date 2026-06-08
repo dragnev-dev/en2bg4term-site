@@ -1,0 +1,348 @@
+@import url(https://fonts.googleapis.com/css?family=Poiret+One&subset=latin,cyrillic);
+@import url(https://fonts.googleapis.com/css?family=Orbitron:900);
+
+* {
+    font-family: monospace;
+    outline: none;
+}
+
+/* Sticky footer: header + a growing <main> + footer fill the viewport, so
+   short pages (notably the home page) keep the footer pinned to the bottom
+   without forcing an unnecessary vertical scroll. */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+main {
+    flex: 1 0 auto;
+}
+
+body, html {
+    height: 100%;
+    min-height: 535px;
+    position: relative;
+    background-color: #2c3e50;
+    padding: 0px;
+    margin: 0px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+#main-title, #main-title span {
+    font-family: Orbitron;
+    color: white;
+    font-size: 50px;
+}
+
+/* Explicit margin so the brand spaces identically whether it renders as an
+   <h1> (home) or an <a> (other pages); the slogan's negative margin tucks
+   under it consistently. */
+#main-title {
+    margin: 0.67em 0;
+}
+
+/* On non-home pages the brand is a link back to the landing page. */
+a#main-title {
+    display: block;
+    text-decoration: none;
+}
+
+#sub-title {
+    font-family: 'Poiret One';
+    font-weight: bold;
+    color: #e67e22;
+    margin-top: -25px;
+    margin-bottom: 60px;
+}
+
+#search-label {
+    color: white;
+    font-size: 15px;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+span#en-flag, span#bg-flag{
+    background-size: contain;
+    background-repeat: no-repeat;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-position: -1px -4px;
+}
+
+span#en-flag {
+    background-image: url('../img/eng.png');
+}
+
+span#bg-flag {
+    background-image: url('../img/bg.png');
+}
+
+/* Global header shown on every page: logo, slogan and search. */
+.site-header {
+    position: relative;
+    text-align: center;
+    padding: 28px 16px 8px;
+}
+/* Roomier top spacing on the home page only. */
+.site-header.is-home {
+    padding-top: 100px;
+}
+#github-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+}
+
+div#content {
+    padding-top: 20px;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+a#github-link img{
+    height: 30px;
+    width: auto;
+    margin: 10px;
+}
+
+@media (max-width: 662px) {
+
+    #main-title {
+        font-size: 36px;
+    }
+
+    #main-title span{
+        font-size: 36px;
+    }
+
+    #sub-title {
+        font-size: 12px;
+    }
+
+    #search-label {
+        font-size: 14px;
+    }
+}
+
+/* ===== Additions for the Hugo rebuild ===== */
+
+/* Allow scrolling on content-heavy pages (override the old single-screen lock). */
+body, html {
+    overflow-y: auto;
+}
+
+a {
+    color: #e67e22;
+}
+
+/* Skip link for keyboard / screen-reader users. */
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    background: #e67e22;
+    color: white;
+    padding: 10px 16px;
+    z-index: 100;
+}
+.skip-link:focus {
+    left: 0;
+}
+
+main:focus {
+    outline: none;
+}
+
+footer {
+    flex-shrink: 0;
+    text-align: center;
+    color: white;
+    padding: 30px 10px;
+    font-size: 14px;
+}
+footer a {
+    color: #e67e22;
+}
+
+/* A–Z index navigation. */
+#az-nav {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);  /* 26 → 2 exact rows */
+    gap: 4px;
+    max-width: 450px;
+    margin: 0 auto;
+}
+#az-nav a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 41px;
+    padding: 6px 0;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    text-decoration: none;
+    border-radius: 3px;
+}
+
+@media (max-width: 485px) { #az-nav { grid-template-columns: repeat(7, 1fr); max-width: 350px; } }  /* 9 / 9 / 8 */
+@media (max-width: 385px) { #az-nav { grid-template-columns: repeat(6, 1fr); max-width: 250px; } }  /* 9 / 9 / 8 */
+#az-nav a:hover, #az-nav a:focus {
+    background: #e67e22;
+}
+#az-nav a.is-current {
+    background: #e67e22;
+    font-weight: bold;
+}
+
+/* ----- Term page ----- */
+article.term, .terms-index {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 30px 20px 60px;
+    text-align: left;
+    color: white;
+}
+article.term .breadcrumb,
+.terms-index .breadcrumb {
+    color: #bbb;
+    font-size: 14px;
+}
+h1.term-en {
+    font-family: 'Poiret One', monospace;
+    color: #e67e22;
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+.term-def dt {
+    color: #bbb;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+.term-def dd {
+    margin: 4px 0 24px;
+    font-size: 22px;
+}
+.term-comment, .term-examples {
+    margin-top: 30px;
+    background: rgba(255,255,255,.06);
+    padding: 16px 20px;
+    border-radius: 4px;
+}
+.term-comment h2, .term-examples h2 {
+    font-size: 16px;
+    color: #e67e22;
+    margin-top: 0;
+}
+.example {
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.example:last-child {
+    border-bottom: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.example-en { color: #ddd; }
+.example-bg { color: white; margin: 4px 0 0; }
+
+/* ----- Terms index list ----- */
+.terms-index h1 { color: white; }
+/* When JS filtering is active, show only the selected letter's group. */
+.terms-index.js-filtered .letter-group { display: none; }
+.terms-index.js-filtered .letter-group.is-active { display: block; }
+.letter-group h2 {
+    color: #e67e22;
+    border-bottom: 1px solid rgba(255,255,255,.2);
+    padding-bottom: 6px;
+}
+ul.term-list {
+    list-style: none;
+    padding: 0;
+    columns: 2;
+    column-gap: 30px;
+}
+@media (max-width: 600px) {
+    ul.term-list { columns: 1; }
+}
+ul.term-list li {
+    break-inside: avoid;
+    margin-bottom: 6px;
+}
+ul.term-list a {
+    color: white;
+    text-decoration: none;
+}
+ul.term-list a:hover, ul.term-list a:focus { color: #e67e22; }
+ul.term-list .t-en { font-weight: bold; }
+ul.term-list .t-bg { color: #bbb; }
+
+/* ----- Pagefind UI theme (dark/orange) ----- */
+/* Positioning context so the results drawer can hang as a dropdown below the
+   input instead of pushing the page content down. */
+#search-holder {
+    position: relative;
+    max-width: 560px;
+    margin: 0 auto;
+    text-align: left;
+}
+#search {
+    --pagefind-ui-scale: 1;
+    --pagefind-ui-primary: #e67e22;
+    --pagefind-ui-text: #2c3e50;
+    --pagefind-ui-background: #ffffff;
+    --pagefind-ui-border: #e67e22;
+    --pagefind-ui-tag: #2c3e50;
+    --pagefind-ui-border-width: 2px;
+    --pagefind-ui-border-radius: 0px;
+    --pagefind-ui-font: monospace;
+}
+
+/* The results live on a dark page, so give them their own light panel that
+   drops down over the content; without this the dark result text would be
+   invisible against the dark background. (Hidden state stays display:none.) */
+#search .pagefind-ui__drawer:not(.pagefind-ui__hidden) {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    margin-top: 8px;
+    padding: 6px 18px 16px;
+    max-height: 65vh;
+    overflow-y: auto;
+    background: #ffffff;
+    color: #2c3e50;
+    border: 2px solid #e67e22;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .45);
+}
+#search .pagefind-ui__result-title a { color: #2c3e50; }
+#search .pagefind-ui__result-link { text-decoration: none; }
+#search .pagefind-ui__result-link:hover,
+#search .pagefind-ui__result-link:focus { color: #e67e22; }
+
+/* Narrower form (form's icon, input, button)*/
+
+form.pagefind-ui__form.svelte-e9gkc3:before { top: calc(16px * var(--pagefind-ui-scale))}
+input.pagefind-ui__search-input.svelte-e9gkc3 { height: calc(46px * var(--pagefind-ui-scale))}
+button.pagefind-ui__search-clear.svelte-e9gkc3 {height: calc(36px * var(--pagefind-ui-scale))}
+
+/* Shorter search results*/
+
+div.pagefind-ui__results-area.svelte-e9gkc3 { margin-top: 0 }
+p.pagefind-ui__message.svelte-e9gkc3 { height: calc(12px * var(--pagefind-ui-scale)) }
+li.pagefind-ui__result.svelte-4xnkmf.svelte-4xnkmf { padding: calc(15px * var(--pagefind-ui-scale)) 0 calc(20px * var(--pagefind-ui-scale)) }
+div.#search .pagefind-ui__drawer:not(.pagefind-ui__hidden) { padding: 6px 19px 16px }
+
+/* No JS */
+
+.no-js #search-label,
+.no-js #search-holder {
+    display: none;
+}
