@@ -1,0 +1,7 @@
+{{- /* Brand logo as a <picture>: AVIF/WebP with a lossless 880px PNG fallback.
+       See partials/head.html for the matching small favicon. */ -}}
+<picture>
+    <source srcset="{{ "img/logo.avif" | relURL }}" type="image/avif">
+    <source srcset="{{ "img/logo.webp" | relURL }}" type="image/webp">
+    <img class="site-logo" src="{{ "img/logo.png" | relURL }}" alt="EN2BGTERM" width="880" height="238">
+</picture>

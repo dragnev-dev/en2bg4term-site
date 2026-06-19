@@ -3,6 +3,10 @@ defaultContentLanguage = "bg"
 title = "EN2BGTERM"
 enableRobotsTXT = true
 
+# Archival source for the brand logo lives in content/ but must never be
+# published — the shipped logo is static/img/logo.{avif,webp,png}.
+ignoreFiles = ["content/logo-original(-.*)?\\.png$"]
+
 # This site has no tags/categories — drop the default taxonomies.
 disableKinds = ["taxonomy", "term"]
 

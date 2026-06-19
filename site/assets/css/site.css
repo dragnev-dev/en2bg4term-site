@@ -1,9 +1,45 @@
-@import url(https://fonts.googleapis.com/css?family=Poiret+One&subset=latin,cyrillic);
-@import url(https://fonts.googleapis.com/css?family=Orbitron:900);
+/* ============================================================
+   EN2BGTERM — cyberpunk/neon theme (neon-cyan lettering,
+   magenta rose, dark signage background).
+
+   shadcn-style design tokens: everything derives from the custom
+   properties below so the palette stays coherent.
+   ============================================================ */
+
+:root {
+    /* palette */
+    --background: #070a12;
+    --foreground: #dbe7f4;
+    --muted-foreground: #afbed0;
+    --subtle-foreground: #7e90a8;
+    --card: #0c1120;
+    --card-translucent: rgba(12, 17, 32, 0.82);
+    --border: #1c2a40;
+
+    --primary: #46e0f2;            /* neon cyan — matches the lettering */
+    --primary-dim: rgba(70, 224, 242, 0.55);
+    --primary-faint: rgba(70, 224, 242, 0.12);
+    --accent: #e36cf5;             /* neon magenta — matches the rose */
+    --accent-faint: rgba(227, 108, 245, 0.14);
+
+    /* effects */
+    --glow-cyan: 0 0 14px rgba(70, 224, 242, 0.35);
+    --glow-magenta: 0 0 14px rgba(227, 108, 245, 0.35);
+    --radius: 10px;
+
+    /* type */
+    --font-body: 'Sofia Sans', sans-serif;             /* has Cyrillic */
+    --font-display: 'Orbitron', 'Exo 2', sans-serif;   /* Latin only */
+}
 
 * {
-    font-family: monospace;
+    box-sizing: border-box;
     outline: none;
+}
+
+::selection {
+    background: var(--primary);
+    color: #04121a;
 }
 
 /* Sticky footer: header + a growing <main> + footer fill the viewport, so
@@ -22,80 +58,137 @@ body, html {
     height: 100%;
     min-height: 535px;
     position: relative;
-    background-color: #2c3e50;
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
     overflow-x: hidden;
     overflow-y: auto;
 }
 
-#main-title, #main-title span {
-    font-family: Orbitron;
-    color: white;
-    font-size: 50px;
+body {
+    font-size: 1.18em;
+    font-family: var(--font-body);
+    color: var(--foreground);
+    background:
+            radial-gradient(55% 38% at 50% -2%, rgba(70, 224, 242, 0.10), transparent 70%),
+            radial-gradient(40% 30% at 85% 8%, rgba(227, 108, 245, 0.07), transparent 70%),
+            var(--background);
 }
 
-/* Explicit margin so the brand spaces identically whether it renders as an
-   <h1> (home) or an <a> (other pages); the slogan's negative margin tucks
-   under it consistently. */
-#main-title {
-    margin: 0.67em 0;
+/* Faint circuit grid over the whole page, fading out toward the bottom. */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+            linear-gradient(rgba(70, 224, 242, 0.045) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(70, 224, 242, 0.045) 1px, transparent 1px);
+    background-size: 42px 42px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.35) 55%, transparent 90%);
+    mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.35) 55%, transparent 90%);
 }
 
-/* On non-home pages the brand is a link back to the landing page. */
-a#main-title {
-    display: block;
-    text-decoration: none;
+a {
+    color: var(--primary);
+}
+a:hover, a:focus-visible {
+    color: var(--accent);
+}
+a:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 2px;
 }
 
-#sub-title {
-    font-family: 'Poiret One';
-    font-weight: bold;
-    color: #e67e22;
-    margin-top: -25px;
-    margin-bottom: 60px;
-}
-
-#search-label {
-    color: white;
-    font-size: 15px;
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-
-span#en-flag, span#bg-flag{
-    background-size: contain;
-    background-repeat: no-repeat;
-    color: transparent;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-position: -1px -4px;
-}
-
-span#en-flag {
-    background-image: url('../img/eng.png');
-}
-
-span#bg-flag {
-    background-image: url('../img/bg.png');
-}
-
-/* Global header shown on every page: logo, slogan and search. */
+/* ----- Global header: logo, slogan and search on every page ----- */
 .site-header {
     position: relative;
     text-align: center;
-    padding: 28px 16px 8px;
+    padding: 36px 16px 8px;
 }
 /* Roomier top spacing on the home page only. */
 .site-header.is-home {
-    padding-top: 100px;
+    padding-top: 90px;
 }
+
+#main-title {
+    display: block;
+    margin: 0 auto;
+    line-height: 0;
+}
+a#main-title {
+    text-decoration: none;
+}
+
+/* The logo png carries its own dark signage background; frame it like a
+   mounted neon sign and let it bleed light onto the page. */
+.site-logo {
+    width: min(440px, 86vw);
+    height: auto;
+    border-radius: calc(var(--radius) + 2px);
+}
+.site-header:not(.is-home) .site-logo {
+    width: min(300px, 70vw);
+}
+a#main-title:hover .site-logo,
+a#main-title:focus-visible .site-logo {
+    box-shadow:
+            0 0 0 1px var(--primary-dim),
+            0 0 40px rgba(70, 224, 242, 0.30),
+            0 0 80px rgba(227, 108, 245, 0.18);
+}
+
+#sub-title {
+    font-family: var(--font-body);
+    font-size: 0.85em;
+    letter-spacing: 0.04em;
+    color: var(--muted-foreground);
+    margin: 18px auto 44px;
+    max-width: 560px;
+}
+#sub-title::before {
+    content: "// ";
+    color: var(--accent);
+}
+.site-header:not(.is-home) #sub-title {
+    margin-bottom: 28px;
+}
+
+#search-label {
+    color: var(--primary);
+    font-size: 0.85em;
+    letter-spacing: 0.06em;
+    margin: 0 0 10px;
+}
+#search-label::after {
+    content: "_";
+    color: var(--accent);
+    animation: cursor-blink 1.1s steps(1) infinite;
+}
+@keyframes cursor-blink {
+    50% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #search-label::after { animation: none; }
+}
+
 #github-link {
     position: absolute;
     top: 0;
-    left: 0;
+    right: 0;
     z-index: 5;
+    opacity: 0.55;
+    transition: opacity .15s ease, filter .15s ease;
+}
+#github-link:hover, #github-link:focus-visible {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px var(--primary-dim));
+}
+a#github-link img {
+    height: 28px;
+    width: auto;
+    margin: 14px;
 }
 
 div#content {
@@ -105,49 +198,14 @@ div#content {
     margin-bottom: 20px;
 }
 
-a#github-link img{
-    height: 30px;
-    width: auto;
-    margin: 10px;
-}
-
-@media (max-width: 662px) {
-
-    #main-title {
-        font-size: 36px;
-    }
-
-    #main-title span{
-        font-size: 36px;
-    }
-
-    #sub-title {
-        font-size: 12px;
-    }
-
-    #search-label {
-        font-size: 14px;
-    }
-}
-
-/* ===== Additions for the Hugo rebuild ===== */
-
-/* Allow scrolling on content-heavy pages (override the old single-screen lock). */
-body, html {
-    overflow-y: auto;
-}
-
-a {
-    color: #e67e22;
-}
-
 /* Skip link for keyboard / screen-reader users. */
 .skip-link {
     position: absolute;
     left: -9999px;
     top: 0;
-    background: #e67e22;
-    color: white;
+    background: var(--primary);
+    color: #04121a;
+    font-family: var(--font-body);
     padding: 10px 16px;
     z-index: 100;
 }
@@ -162,42 +220,63 @@ main:focus {
 footer {
     flex-shrink: 0;
     text-align: center;
-    color: white;
-    padding: 30px 10px;
-    font-size: 14px;
+    color: var(--muted-foreground);
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+    padding: 26px 10px;
+    font-size: 15px;
 }
 footer a {
-    color: #e67e22;
+    color: var(--primary);
+    text-decoration: none;
 }
 
-/* A–Z index navigation. */
+.sep { margin: 0 0.5em; }
+
+footer a:hover, footer a:focus-visible {
+    color: var(--accent);
+    text-shadow: var(--glow-magenta);
+}
+
+/* ----- A–Z index navigation ----- */
 #az-nav {
     display: grid;
     grid-template-columns: repeat(9, 1fr);  /* 26 → 2 exact rows */
-    gap: 4px;
-    max-width: 450px;
+    gap: 6px;
+    max-width: 470px;
     margin: 0 auto;
 }
 #az-nav a {
     display: flex;
     align-items: center;
     justify-content: center;
-    max-width: 41px;
-    padding: 6px 0;
-    color: #fff;
-    background: rgba(255, 255, 255, 0.12);
+    max-width: 46px;
+    padding: 8px 0;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--primary);
+    background: var(--primary-faint);
+    border: 1px solid var(--border);
+    border-radius: 6px;
     text-decoration: none;
-    border-radius: 3px;
+    transition: box-shadow .15s ease, border-color .15s ease, color .15s ease;
 }
-
-@media (max-width: 485px) { #az-nav { grid-template-columns: repeat(7, 1fr); max-width: 350px; } }  /* 9 / 9 / 8 */
-@media (max-width: 385px) { #az-nav { grid-template-columns: repeat(6, 1fr); max-width: 250px; } }  /* 9 / 9 / 8 */
-#az-nav a:hover, #az-nav a:focus {
-    background: #e67e22;
+@media (max-width: 485px) { #az-nav { grid-template-columns: repeat(7, 1fr); max-width: 370px; } }
+@media (max-width: 385px) { #az-nav { grid-template-columns: repeat(6, 1fr); max-width: 280px; } }
+#az-nav a:hover, #az-nav a:focus-visible {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-faint);
+    box-shadow: var(--glow-magenta);
+    outline: none;
 }
 #az-nav a.is-current {
-    background: #e67e22;
-    font-weight: bold;
+    color: #04121a;
+    background: var(--primary);
+    border-color: var(--primary);
+    box-shadow: var(--glow-cyan);
+    font-weight: 700;
 }
 
 /* ----- Term page ----- */
@@ -206,62 +285,152 @@ article.term, .terms-index {
     margin: 0 auto;
     padding: 30px 20px 60px;
     text-align: left;
-    color: white;
+    color: var(--foreground);
 }
 article.term .breadcrumb,
 .terms-index .breadcrumb {
-    color: #bbb;
-    font-size: 14px;
-}
-h1.term-en {
-    font-family: 'Poiret One', monospace;
-    color: #e67e22;
-    font-size: 40px;
-    margin-bottom: 10px;
-}
-.term-def dt {
-    color: #bbb;
+    color: var(--muted-foreground);
     font-size: 13px;
+    letter-spacing: 0.04em;
+}
+article.term .breadcrumb a,
+.terms-index .breadcrumb a {
+    color: var(--muted-foreground);
+    text-decoration: none;
+}
+article.term .breadcrumb a:hover,
+article.term .breadcrumb a:focus-visible {
+    color: var(--primary);
+}
+
+h1.term-en {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(30px, 6vw, 42px);
+    letter-spacing: 0.02em;
+    margin: 18px 0 14px;
+    background: linear-gradient(100deg, var(--primary) 30%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 16px rgba(70, 224, 242, 0.25));
+}
+
+.term-def dt {
+    color: var(--muted-foreground);
+    font-size: 12px;
     text-transform: uppercase;
-    letter-spacing: .05em;
+    letter-spacing: 0.12em;
+}
+.term-def dt::before {
+    content: "▸ ";
+    color: var(--accent);
 }
 .term-def dd {
-    margin: 4px 0 24px;
-    font-size: 22px;
+    margin: 8px 0 24px;
+    font-family: var(--font-body);
+    font-size: 24px;
+    line-height: 1.4;
 }
+
+/* Bordered cards (shadcn-style) with a neon top edge. */
 .term-comment, .term-examples {
+    position: relative;
     margin-top: 30px;
-    background: rgba(255,255,255,.06);
-    padding: 16px 20px;
-    border-radius: 4px;
+    background: var(--card-translucent);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    overflow: hidden;
+}
+.term-comment::before, .term-examples::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary), var(--accent), transparent 85%);
+    opacity: 0.7;
 }
 .term-comment h2, .term-examples h2 {
-    font-size: 16px;
-    color: #e67e22;
-    margin-top: 0;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--primary);
+    margin: 0 0 12px;
 }
+.term-comment {
+    line-height: 1.6;
+}
+
 .example {
     margin-bottom: 14px;
     padding-bottom: 14px;
-    border-bottom: 1px solid rgba(255,255,255,.12);
+    border-bottom: 1px dashed var(--border);
 }
 .example:last-child {
     border-bottom: 0;
     margin-bottom: 0;
     padding-bottom: 0;
 }
-.example-en { color: #ddd; }
-.example-bg { color: white; margin: 4px 0 0; }
+.example-en {
+    color: var(--foreground);
+    margin: 0 0 4px;
+}
+.example-en::before {
+    content: "EN ";
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 700;
+}
+.example-bg {
+    color: var(--foreground);
+    margin: 4px 0 0;
+}
+.example-bg::before {
+    content: "BG ";
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+}
 
 /* ----- Terms index list ----- */
-.terms-index h1 { color: white; }
+.terms-index h1 {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--foreground);
+    margin: 6px 0 18px;
+}
+.terms-index h1::after {
+    content: "";
+    display: block;
+    width: 64px;
+    height: 2px;
+    margin-top: 8px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.terms-index #az-nav {
+    margin: 0 0 8px;
+}
+
 /* When JS filtering is active, show only the selected letter's group. */
 .terms-index.js-filtered .letter-group { display: none; }
 .terms-index.js-filtered .letter-group.is-active { display: block; }
+
 .letter-group h2 {
-    color: #e67e22;
-    border-bottom: 1px solid rgba(255,255,255,.2);
-    padding-bottom: 6px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 28px;
+    color: var(--primary);
+    text-shadow: var(--glow-cyan);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
 }
 ul.term-list {
     list-style: none;
@@ -271,20 +440,31 @@ ul.term-list {
 }
 @media (max-width: 600px) {
     ul.term-list { columns: 1; }
+    .terms-index #az-nav {
+        margin: 0 auto 8px;
+    }
 }
 ul.term-list li {
     break-inside: avoid;
     margin-bottom: 6px;
 }
 ul.term-list a {
-    color: white;
+    color: var(--foreground);
     text-decoration: none;
+    font-size: 16px;
 }
-ul.term-list a:hover, ul.term-list a:focus { color: #e67e22; }
-ul.term-list .t-en { font-weight: bold; }
-ul.term-list .t-bg { color: #bbb; }
+ul.term-list a:hover .t-en, ul.term-list a:focus-visible .t-en {
+    color: var(--accent);
+    text-shadow: var(--glow-magenta);
+}
+ul.term-list .t-en {
+    font-weight: 700;
+    color: var(--primary);
+}
+ul.term-list .t-sep { color: var(--border); }
+ul.term-list .t-bg { color: var(--muted-foreground); }
 
-/* ----- Pagefind UI theme (dark/orange) ----- */
+/* ----- Pagefind UI theme (dark neon) ----- */
 /* Positioning context so the results drawer can hang as a dropdown below the
    input instead of pushing the page content down. */
 #search-holder {
@@ -294,54 +474,107 @@ ul.term-list .t-bg { color: #bbb; }
     text-align: left;
 }
 #search {
-    --pagefind-ui-scale: 1;
-    --pagefind-ui-primary: #e67e22;
-    --pagefind-ui-text: #2c3e50;
-    --pagefind-ui-background: #ffffff;
-    --pagefind-ui-border: #e67e22;
-    --pagefind-ui-tag: #2c3e50;
-    --pagefind-ui-border-width: 2px;
-    --pagefind-ui-border-radius: 0px;
-    --pagefind-ui-font: monospace;
+    --pagefind-ui-scale: 0.9;
+    --pagefind-ui-primary: var(--primary);
+    --pagefind-ui-text: var(--foreground);
+    --pagefind-ui-background: var(--card);
+    --pagefind-ui-border: rgba(70, 224, 242, 0.28);
+    --pagefind-ui-tag: var(--card);
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 8px;
+    --pagefind-ui-font: var(--font-body);
 }
 
-/* The results live on a dark page, so give them their own light panel that
-   drops down over the content; without this the dark result text would be
-   invisible against the dark background. (Hidden state stays display:none.) */
+#search .pagefind-ui__search-input {
+    color: var(--foreground);
+    font-weight: 400;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+#search .pagefind-ui__search-input::placeholder {
+    color: var(--muted-foreground);
+    opacity: 1;
+}
+#search .pagefind-ui__search-input:focus {
+    border-color: var(--primary);
+    box-shadow: var(--glow-cyan);
+}
+#search .pagefind-ui__search-clear {
+    color: var(--muted-foreground);
+    background: transparent;
+}
+#search .pagefind-ui__search-clear:hover,
+#search .pagefind-ui__search-clear:focus-visible {
+    color: var(--accent);
+}
+
+/* The results hang as a glowing dropdown panel over the page content. */
 #search .pagefind-ui__drawer:not(.pagefind-ui__hidden) {
     position: absolute;
     left: 0;
     right: 0;
     z-index: 20;
-    margin-top: 8px;
-    padding: 6px 18px 16px;
+    margin-top: 10px;
+    padding: 8px 18px 16px;
     max-height: 65vh;
     overflow-y: auto;
-    background: #ffffff;
-    color: #2c3e50;
-    border: 2px solid #e67e22;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, .45);
+    background: var(--card-translucent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    color: var(--foreground);
+    border: 1px solid var(--primary-dim);
+    border-radius: var(--radius);
+    box-shadow:
+            0 0 24px rgba(70, 224, 242, 0.18),
+            0 16px 40px rgba(0, 0, 0, 0.6);
 }
-#search .pagefind-ui__result-title a { color: #2c3e50; }
+#search .pagefind-ui__message {
+    color: var(--muted-foreground);
+}
+#search .pagefind-ui__result {
+    border-top: 1px solid var(--border);
+}
+#search .pagefind-ui__result-title a {
+    color: var(--primary);
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
 #search .pagefind-ui__result-link { text-decoration: none; }
 #search .pagefind-ui__result-link:hover,
-#search .pagefind-ui__result-link:focus { color: #e67e22; }
+#search .pagefind-ui__result-link:focus-visible {
+    color: var(--accent);
+    text-shadow: var(--glow-magenta);
+}
+#search .pagefind-ui__result-excerpt {
+    color: var(--muted-foreground);
+}
+#search .pagefind-ui__result-excerpt mark {
+    background: var(--accent-faint);
+    color: var(--accent);
+    border-radius: 3px;
+    padding: 0 2px;
+}
+#search .pagefind-ui__button {
+    color: var(--primary);
+    background: var(--primary-faint);
+    border: 1px solid var(--border);
+}
+#search .pagefind-ui__button:hover,
+#search .pagefind-ui__button:focus-visible {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-faint);
+}
 
-/* Narrower form (form's icon, input, button)*/
+/* Tighter form & results metrics (overrides Pagefind defaults). */
+#search .pagefind-ui__form::before { top: calc(16px * var(--pagefind-ui-scale)); }
+#search .pagefind-ui__search-input { height: calc(50px * var(--pagefind-ui-scale)); }
+#search .pagefind-ui__search-clear { height: calc(40px * var(--pagefind-ui-scale)); }
+#search .pagefind-ui__results-area { margin-top: 0; }
+#search .pagefind-ui__message { height: auto; padding: 8px 0; }
+#search .pagefind-ui__result { padding: calc(15px * var(--pagefind-ui-scale)) 0 calc(18px * var(--pagefind-ui-scale)); }
 
-form.pagefind-ui__form.svelte-e9gkc3:before { top: calc(16px * var(--pagefind-ui-scale))}
-input.pagefind-ui__search-input.svelte-e9gkc3 { height: calc(46px * var(--pagefind-ui-scale))}
-button.pagefind-ui__search-clear.svelte-e9gkc3 {height: calc(36px * var(--pagefind-ui-scale))}
-
-/* Shorter search results*/
-
-div.pagefind-ui__results-area.svelte-e9gkc3 { margin-top: 0 }
-p.pagefind-ui__message.svelte-e9gkc3 { height: calc(12px * var(--pagefind-ui-scale)) }
-li.pagefind-ui__result.svelte-4xnkmf.svelte-4xnkmf { padding: calc(15px * var(--pagefind-ui-scale)) 0 calc(20px * var(--pagefind-ui-scale)) }
-div.#search .pagefind-ui__drawer:not(.pagefind-ui__hidden) { padding: 6px 19px 16px }
-
-/* No JS */
-
+/* ----- No JS ----- */
 .no-js #search-label,
 .no-js #search-holder {
     display: none;

@@ -12,9 +12,14 @@
 <meta property="og:description" content="{{ $desc | truncate 160 }}">
 <meta property="og:type" content="{{ cond .IsHome "website" "article" }}">
 <meta property="og:url" content="{{ .Permalink }}">
+<meta name="theme-color" content="#070a12">
+<link rel="icon" type="image/png" href="{{ "img/favicon.png" | relURL }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Orbitron:wght@500;700;900&display=swap">
 {{- with resources.Get "css/site.css" }}
-  {{- $css := . | minify | fingerprint -}}
-  <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+{{- $css := . | minify | fingerprint -}}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
 {{- end }}
 <link href="{{ "pagefind/pagefind-ui.css" | relURL }}" rel="stylesheet">
 <script>document.documentElement.classList.remove('no-js');</script>
