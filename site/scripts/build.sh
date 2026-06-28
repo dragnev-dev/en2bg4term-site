@@ -6,6 +6,9 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+echo "==> Testing parser"
+python3 scripts/test_build_data.py
+
 echo "==> Parsing source markdown -> data/terms.json"
 python3 scripts/build_data.py
 

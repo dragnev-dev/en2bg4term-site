@@ -7,6 +7,7 @@ Static rebuild of the EN→BG IT-terminology dictionary. One crawlable page per 
 ```bash
 bash scripts/build.sh          # parse data → hugo build → pagefind index → ./public
 hugo server                    # local dev (handles baseURL; run build_data.py first)
+python3 scripts/test_build_data.py   # parser unit tests (also run by build.sh + CI)
 ```
 
 `scripts/build.sh` runs three stages:
