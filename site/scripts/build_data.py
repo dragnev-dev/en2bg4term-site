@@ -30,6 +30,12 @@ EX_LINE_RE = re.compile(r"^\s*\*\s+(EN|BG):\s*(.+?)\s*$")
 # Header / separator rows to skip (cf. excapeWordArray in js/site.js).
 SKIP_CELL = {"en", "bg", "забележка", "коментар", ""}
 
+SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")  # what slugify is meant to emit
+
+
+class ValidationError(Exception):
+    """Raised when parsed output violates a build-blocking invariant."""
+
 
 def read_source(src: str) -> str:
     if src.startswith(("http://", "https://")):
@@ -141,11 +147,41 @@ def parse_dictionary(text: str, examples: dict):
     return terms, letters
 
 
+def validate(terms: list, letters: list) -> None:
+    """Fail the build on data that would deploy broken pages.
+
+    Avoids cases of incorrectly parsing the source data, preventing bad deployments
+    """
+    errors = []
+    if not terms:
+        errors.append("no terms parsed — check DICT_SRC and section/table format")
+    if not letters:
+        errors.append("no letter sections found")
+
+    seen: dict[str, int] = {}
+    for t in terms:
+        seen[t["slug"]] = seen.get(t["slug"], 0) + 1
+    dupes = sorted(s for s, n in seen.items() if n > 1)
+    if dupes:
+        errors.append(f"duplicate slugs (would collide URLs): {dupes}")
+
+    for t in terms:
+        if not SLUG_RE.match(t["slug"]):
+            errors.append(f"malformed slug {t['slug']!r} for en={t['en_raw']!r}")
+        if not t["en_raw"] or not t["bg_raw"]:
+            errors.append(f"empty en/bg for slug {t['slug']!r}")
+
+    if errors:
+        raise ValidationError(
+            "terms.json failed validation:\n  - " + "\n  - ".join(errors))
+
+
 def main():
     dict_text = read_source(DICT_SRC)
     ex_text = read_source(EXAMPLES_SRC)
     examples = parse_examples(ex_text)
     terms, letters = parse_dictionary(dict_text, examples)
+    validate(terms, letters)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     payload = {"letters": letters, "terms": terms}
