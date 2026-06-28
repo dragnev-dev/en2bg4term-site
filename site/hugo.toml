@@ -14,6 +14,9 @@ disableKinds = ["taxonomy", "term"]
   description = "Превод на терминология в контекста на информационните технологии — английско-български речник."
   description_suffix = "Речник с грижливо подбирани преводи на често срещани понятия."
   github = "https://github.com/stelf/en2bg4term/"
+  # Canonical production URL. Keep in sync with baseURL above. Used to
+  # Avoid indexing any kind of non-prod instances
+  prod_baseurl = "https://stelf.github.io/en2bg4term/"
 
 [sitemap]
   changefreq = "monthly"

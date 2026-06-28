@@ -1,5 +1,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+{{- if ne site.BaseURL site.Params.prod_baseurl }}
+<meta name="robots" content="noindex, nofollow">
+{{- end }}
 {{- $title := cond .IsHome site.Title (printf "%s — %s" .Title site.Title) -}}
 <title>{{ $title }}</title>
 {{- $desc := site.Params.description -}}
