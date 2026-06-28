@@ -19,7 +19,7 @@ DICT_SRC = os.environ.get("DICT_SRC", str(REPO_ROOT / "README.md"))
 EXAMPLES_SRC = os.environ.get("EXAMPLES_SRC", str(REPO_ROOT / "examples.md"))
 OUT = SITE_DIR / "data" / "terms.json"
 
-LINK_RE = re.compile(r"\[([^\]]*)\]\([^)]*\)")          # [label](url) -> label
+LINK_RE = re.compile(r"\[([^\]]*)\]\((?:[^()]|\([^()]*\))*\)")  # [label](url) -> label; url may nest one level of parens (e.g. Wikipedia)
 PREFIX_RE = re.compile(r"^\((?:to|an|a)\)\s+", re.I)    # leading (to)/(an)/(a)
 PAREN_RE = re.compile(r"\([^)]*\)")                     # parenthetical clarifiers
 SECTION_RE = re.compile(r"^###\s+(.+?)\s*$")            # dictionary letter header
