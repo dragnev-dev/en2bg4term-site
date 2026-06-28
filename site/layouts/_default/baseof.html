@@ -7,7 +7,7 @@
 <body>
     <a class="skip-link" href="#main">Към съдържанието</a>
     {{ partial "site-header.html" . }}
-    <main id="main">
+    <main id="main" tabindex="-1">
         {{ block "main" . }}{{ end }}
     </main>
     <footer>
