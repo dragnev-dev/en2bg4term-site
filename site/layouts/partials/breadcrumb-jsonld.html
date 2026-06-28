@@ -1,0 +1,14 @@
+{{- /* BreadcrumbList structured data for a single term page.
+       Mirrors the visible breadcrumb (Термини / letter), rooted at Home. */ -}}
+{{- $items := slice
+    (dict "@type" "ListItem" "position" 1 "name" site.Title "item" site.Home.Permalink)
+    (dict "@type" "ListItem" "position" 2 "name" "Термини" "item" ("terms/" | absURL))
+    (dict "@type" "ListItem" "position" 3 "name" .Params.letter "item" (printf "terms/#letter-%s" (urlize .Params.letter) | absURL))
+    (dict "@type" "ListItem" "position" 4 "name" .Title "item" .Permalink)
+-}}
+{{- $data := dict
+    "@context" "https://schema.org"
+    "@type" "BreadcrumbList"
+    "itemListElement" $items
+-}}
+<script type="application/ld+json">{{ $data | jsonify | safeJS }}</script>
