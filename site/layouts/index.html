@@ -5,5 +5,22 @@
         <a href="{{ printf "terms/#letter-%s" (urlize .) | relURL }}">{{ . }}</a>
         {{ end }}
     </nav>
+
+    {{- /* SEO/landing copy: gives prose to crawlers and first-time visitors real
+           term count rounded down to the nearest 100 so the over phrasing stays truthful */ -}}
+    {{- $count := math.Floor (div (len hugo.Data.terms.terms) 100) | mul 100 | int -}}
+    <section id="intro" aria-labelledby="intro-h">
+        <h2 id="intro-h">За речника</h2>
+        <p>
+            <strong>EN2BG4TERM</strong> е речник на понятията от
+            информационните технологии — над {{ $count }} грижливо подбрани думи от
+            програмирането, изкуствения интелект, компютърните мрежи и поддръжката
+            на системи. Потърсете дума в полето за търсене по-горе или прегледайте всички понятия по
+            азбучен ред.
+        </p>
+        <p>
+            Запознайте се подробно <a href="{{ site.Params.github }}/#далновидност-визия">с речника</a>.
+        </p>
+    </section>
 </div>
 {{ end }}

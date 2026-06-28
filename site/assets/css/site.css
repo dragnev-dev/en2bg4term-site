@@ -284,6 +284,44 @@ footer a:hover, footer a:focus-visible {
     font-weight: 700;
 }
 
+/* ----- Home page intro / landing copy ----- */
+#intro {
+    max-width: 620px;
+    margin: 52px auto 0;
+    padding: 22px 26px;
+    text-align: left;
+    background: var(--card-translucent);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    line-height: 1.65;
+    color: var(--muted-foreground);
+}
+#intro-h {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--primary);
+    margin: 0 0 14px;
+}
+#intro-h::before {
+    content: "// ";
+    color: var(--accent);
+}
+#intro p {
+    margin: 0 0 14px;
+}
+#intro p:last-child {
+    margin-bottom: 0;
+}
+#intro strong {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--foreground);
+}
+
 /* ----- Term page ----- */
 article.term, .terms-index {
     max-width: 760px;
