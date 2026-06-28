@@ -23,3 +23,6 @@
 {{- end }}
 <link href="{{ "pagefind/pagefind-ui.css" | relURL }}" rel="stylesheet">
 <script>document.documentElement.classList.remove('no-js');</script>
+<script type="speculationrules">
+    { "prerender": [{ "where": { "href_matches": "/*" }, "eagerness": "moderate" }] }
+</script>
