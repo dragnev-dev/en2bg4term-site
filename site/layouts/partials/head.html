@@ -3,7 +3,8 @@
 {{- if ne site.BaseURL site.Params.prod_baseurl }}
 <meta name="robots" content="noindex, nofollow">
 {{- end }}
-{{- $title := cond .IsHome site.Title (printf "%s — %s" .Title site.Title) -}}
+{{- $pageTitle := cond (eq .Kind "404") "Страницата не е намерена" .Title -}}
+{{- $title := cond .IsHome site.Title (printf "%s — %s" $pageTitle site.Title) -}}
 <title>{{ $title }}</title>
 {{- $desc := site.Params.description -}}
 {{- if and (not .IsHome) .Params.bg_raw -}}
@@ -17,6 +18,7 @@
 <meta property="og:url" content="{{ .Permalink }}">
 <meta property="og:locale" content="bg_BG">
 <meta name="theme-color" content="#070a12">
+<link rel="icon" type="image/svg+xml" href="{{ "img/favicon.svg" | relURL }}">
 <link rel="icon" type="image/png" href="{{ "img/favicon.png" | relURL }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

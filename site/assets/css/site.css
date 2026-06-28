@@ -469,6 +469,61 @@ ul.term-list .t-en {
 ul.term-list .t-sep { color: var(--border); }
 ul.term-list .t-bg { color: var(--muted-foreground); }
 
+/* ----- 404 page ----- */
+.notfound {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+    text-align: center;
+}
+.notfound-img {
+    display: block;
+    width: min(560px, 88vw);
+    height: auto;
+    margin: 0 auto 8px;
+    filter: drop-shadow(0 0 28px rgba(70, 224, 242, 0.20));
+}
+.notfound-lead {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: clamp(22px, 4.5vw, 30px);
+    color: var(--foreground);
+    margin: 18px 0 14px;
+}
+.notfound-text {
+    color: var(--muted-foreground);
+    line-height: 1.6;
+    max-width: 460px;
+    margin: 0 auto 26px;
+}
+.notfound-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin: 0;
+}
+.nf-btn {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    color: var(--primary);
+    background: var(--primary-faint);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 20px;
+    text-decoration: none;
+    transition: box-shadow .15s ease, border-color .15s ease, color .15s ease, background .15s ease;
+}
+.nf-btn:hover, .nf-btn:focus-visible {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--accent-faint);
+    box-shadow: var(--glow-magenta);
+    outline: none;
+}
+
 /* ----- Pagefind UI theme (dark neon) ----- */
 /* Positioning context so the results drawer can hang as a dropdown below the
    input instead of pushing the page content down. */

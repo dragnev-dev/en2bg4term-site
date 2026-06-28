@@ -1,0 +1,19 @@
+{{ define "main" }}
+{{- /* 404 page, uses the shared header */ -}}
+<section class="notfound" aria-labelledby="nf-title">
+    <picture>
+        <source srcset="{{ "img/404.avif" | relURL }}" type="image/avif">
+        <img class="notfound-img" src="{{ "img/404.png" | relURL }}" alt="404"
+             width="1120" height="491" loading="eager" decoding="async">
+    </picture>
+    <h1 id="nf-title" class="notfound-lead">Страницата не е намерена</h1>
+    <p class="notfound-text">
+        Този термин го няма в речника или връзката е остаряла.
+        Опитайте търсачката горе или разгледайте указателя.
+    </p>
+    <p class="notfound-actions">
+        <a class="nf-btn" href="{{ site.Home.RelPermalink }}">Начало</a>
+        <a class="nf-btn" href="{{ "terms/" | relURL }}">Всички термини</a>
+    </p>
+</section>
+{{ end }}
