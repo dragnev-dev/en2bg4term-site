@@ -1,27 +1,31 @@
-{{- /* Boots the global Pagefind UI in the #search box rendered by site-header. */ -}}
-<script src="{{ "pagefind/pagefind-ui.js" | relURL }}"></script>
-<script>
-    window.addEventListener('DOMContentLoaded', function () {
-        new PagefindUI({
-            element: "#search",
-            showImages: false,
-            showSubResults: true,
-            translations: {
-                placeholder: "Търсене на термин",
-                clear_search: "Изчисти",
-                load_more: "Покажи още",
-                search_label: "Търсене на термин",
-                zero_results: "Няма резултати за [SEARCH_TERM]",
-                many_results: "[COUNT] резултата за [SEARCH_TERM]",
-                one_result: "[COUNT] резултат за [SEARCH_TERM]",
-                searching: "Търсене на [SEARCH_TERM]…"
-            }
+{{- /* Boots the Pagefind Component UI <pagefind-searchbox> rendered by
+       site-header.Module scripts run in document order, so the
+       global API is exposed by the time the inline module below runs. Bulgarian
+       is not a built-in Pagefind locale, so the visible strings are set here;
+       the placeholder is also set declaratively on the element. */ -}}
+<script type="module" src="{{ "pagefind/pagefind-component-ui.js" | relURL }}"></script>
+<script type="module">
+    function applyTranslations() {
+        const pf = window.PagefindComponents;
+        if (!pf || !pf.getInstanceManager) return false;
+        pf.getInstanceManager().getInstance("default").setTranslations({
+            placeholder: "Търсене на термин",
+            search_label: "Търсене на термин",
+            results_label: "Резултати от търсенето",
+            clear_search: "Изчисти",
+            load_more: "Покажи още",
+            searching: "Търсене на [SEARCH_TERM]…",
+            zero_results: "Няма резултати за [SEARCH_TERM]",
+            one_result: "[COUNT] резултат за [SEARCH_TERM]",
+            many_results: "[COUNT] резултата за [SEARCH_TERM]",
+            total_zero_results: "Няма резултати",
+            total_one_result: "[COUNT] резултат",
+            total_many_results: "[COUNT] резултата"
         });
-        var input = document.querySelector('#search input');
-        if (input) {
-            input.setAttribute('aria-label', 'Търсене на термин');
-            {{ if .IsHome }}// Focus only on the landing page so term pages don't steal focus.
-            input.focus();{{ end }}
-        }
-    });
+        return true;
+    }
+    // Module order guarantees the API is ready; fall back just in case.
+    if (!applyTranslations()) {
+        customElements.whenDefined("pagefind-searchbox").then(applyTranslations);
+    }
 </script>

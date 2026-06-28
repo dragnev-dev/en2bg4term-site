@@ -16,7 +16,15 @@
     {{ end }}
     <p id="sub-title">Превод на терминология в контекста на информационните технологии</p>
     <p id="search-label">Въведете английски термин:</p>
-    <div id="search-holder">
-        <div id="search" role="search" aria-label="Търсене на термин"></div>
+    <div id="search-holder" role="search" aria-label="Търсене на термин">
+        <pagefind-searchbox
+                placeholder="Търсене на термин"
+                show-sub-results
+                show-keyboard-hints="false"
+                hide-shortcut
+                {{- if .IsHome }} autofocus{{ end }}>
+            {{- /* Point at the bundle under the deploy subpath. */ -}}
+            <pagefind-config bundle-path="{{ "pagefind/" | relURL }}"></pagefind-config>
+        </pagefind-searchbox>
     </div>
 </header>

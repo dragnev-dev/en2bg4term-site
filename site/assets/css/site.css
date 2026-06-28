@@ -524,115 +524,90 @@ ul.term-list .t-bg { color: var(--muted-foreground); }
     outline: none;
 }
 
-/* ----- Pagefind UI theme (dark neon) ----- */
-/* Positioning context so the results drawer can hang as a dropdown below the
-   input instead of pushing the page content down. */
+/* ----- Pagefind Component UI theme (dark neon) ----- */
+/* Pagefind 1.5+ <pagefind-searchbox>. !important is the clean way to
+   apply css — the bundled rules themselves are not !important. */
 #search-holder {
-    position: relative;
     max-width: 560px;
     margin: 0 auto;
     text-align: left;
-}
-#search {
-    --pagefind-ui-scale: 0.9;
-    --pagefind-ui-primary: var(--primary);
-    --pagefind-ui-text: var(--foreground);
-    --pagefind-ui-background: var(--card);
-    --pagefind-ui-border: rgba(70, 224, 242, 0.28);
-    --pagefind-ui-tag: var(--card);
-    --pagefind-ui-border-width: 1px;
-    --pagefind-ui-border-radius: 8px;
-    --pagefind-ui-font: var(--font-body);
+
+    --pf-font: var(--font-body);
+    --pf-background: var(--card);
+    --pf-text: var(--foreground);
+    --pf-text-secondary: var(--muted-foreground);
+    --pf-text-muted: var(--muted-foreground);
+    --pf-border: rgba(70, 224, 242, 0.28);
+    --pf-border-focus: var(--primary);
+    --pf-border-radius: 8px;
+    --pf-hover: var(--primary-faint);
+    --pf-mark: var(--accent);
+    --pf-outline-focus: var(--primary);
+    --pf-outline-width: 1px;
+    --pf-input-height: 52px;
+    --pf-input-font-size: 1.2rem;
+    --pf-searchbox-max-width: 560px;
+    --pf-searchbox-dropdown-max-height: 65vh;
 }
 
-#search .pagefind-ui__search-input {
-    color: var(--foreground);
-    font-weight: 400;
-    transition: border-color .15s ease, box-shadow .15s ease;
+#search-holder .pf-searchbox-input-wrapper::before {
+    width: 18px;
+    height: 18px;
 }
-#search .pagefind-ui__search-input::placeholder {
-    color: var(--muted-foreground);
-    opacity: 1;
-}
-#search .pagefind-ui__search-input:focus {
+#search-holder .pf-searchbox-input { padding-inline-start: 38px; }
+#search-holder .pf-searchbox-input:focus { padding-inline-start: 38px; }
+
+/* Soft cyan glow on focus instead of the bundled solid ring. */
+#search-holder .pf-searchbox-input:focus,
+#search-holder .pf-searchbox-input:focus-visible {
     border-color: var(--primary);
-    box-shadow: var(--glow-cyan);
-}
-#search .pagefind-ui__search-clear {
-    color: var(--muted-foreground);
-    background: transparent;
-}
-#search .pagefind-ui__search-clear:hover,
-#search .pagefind-ui__search-clear:focus-visible {
-    color: var(--accent);
+    box-shadow: var(--glow-cyan) !important;
 }
 
-/* The results hang as a glowing dropdown panel over the page content. */
-#search .pagefind-ui__drawer:not(.pagefind-ui__hidden) {
-    position: absolute;
-    left: 0;
-    right: 0;
-    z-index: 20;
-    margin-top: 10px;
-    padding: 8px 18px 16px;
-    max-height: 65vh;
-    overflow-y: auto;
-    background: var(--card-translucent);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    color: var(--foreground);
-    border: 1px solid var(--primary-dim);
-    border-radius: var(--radius);
+#search-holder .pf-searchbox.open .pf-searchbox-input {
+    border-radius: var(--pf-border-radius) !important;
+    border-bottom-color: var(--pf-border) !important;
+}
+#search-holder .pf-searchbox-dropdown {
+    padding: 8px 6px 12px;
+    background: var(--card-translucent) !important;
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--primary-dim) !important;
+    border-radius: var(--radius) !important;
     box-shadow:
             0 0 24px rgba(70, 224, 242, 0.18),
-            0 16px 40px rgba(0, 0, 0, 0.6);
+            0 16px 40px rgba(0, 0, 0, 0.6) !important;
 }
-#search .pagefind-ui__message {
-    color: var(--muted-foreground);
-}
-#search .pagefind-ui__result {
-    border-top: 1px solid var(--border);
-}
-#search .pagefind-ui__result-title a {
-    color: var(--primary);
-    font-family: var(--font-display);
-    font-weight: 500;
+
+#search-holder .pf-searchbox-result-title {
+    color: var(--primary) !important;
+    font-family: var(--font-display) !important;
+    font-size: 1.2rem !important;
     letter-spacing: 0.02em;
 }
-#search .pagefind-ui__result-link { text-decoration: none; }
-#search .pagefind-ui__result-link:hover,
-#search .pagefind-ui__result-link:focus-visible {
-    color: var(--accent);
+
+#search-holder .pf-searchbox-result-excerpt {
+    font-size: 1rem !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+}
+
+.pf-searchbox-result {
+    border-radius: 10px !important;
+}
+#search-holder .pf-searchbox-result:hover .pf-searchbox-result-title,
+#search-holder .pf-searchbox-result[data-pf-selected] .pf-searchbox-result-title {
+    color: var(--accent) !important;
     text-shadow: var(--glow-magenta);
 }
-#search .pagefind-ui__result-excerpt {
-    color: var(--muted-foreground);
-}
-#search .pagefind-ui__result-excerpt mark {
-    background: var(--accent-faint);
-    color: var(--accent);
+/* Magenta highlight on matched text (colour comes from --pf-mark above). */
+#search-holder .pf-searchbox-result-excerpt mark {
+    background: var(--accent-faint) !important;
     border-radius: 3px;
     padding: 0 2px;
 }
-#search .pagefind-ui__button {
-    color: var(--primary);
-    background: var(--primary-faint);
-    border: 1px solid var(--border);
-}
-#search .pagefind-ui__button:hover,
-#search .pagefind-ui__button:focus-visible {
-    color: var(--accent);
-    border-color: var(--accent);
-    background: var(--accent-faint);
-}
-
-/* Tighter form & results metrics (overrides Pagefind defaults). */
-#search .pagefind-ui__form::before { top: calc(16px * var(--pagefind-ui-scale)); }
-#search .pagefind-ui__search-input { height: calc(50px * var(--pagefind-ui-scale)); }
-#search .pagefind-ui__search-clear { height: calc(40px * var(--pagefind-ui-scale)); }
-#search .pagefind-ui__results-area { margin-top: 0; }
-#search .pagefind-ui__message { height: auto; padding: 8px 0; }
-#search .pagefind-ui__result { padding: calc(15px * var(--pagefind-ui-scale)) 0 calc(18px * var(--pagefind-ui-scale)); }
 
 /* ----- No JS ----- */
 .no-js #search-label,

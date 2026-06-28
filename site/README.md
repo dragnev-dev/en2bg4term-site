@@ -36,6 +36,11 @@ bash scripts/build.sh
 
 `data/terms.json`, `public/`, and `resources/` are generated and git-ignored.
 
+## Search UI
+
+- Relying on pagefind Component UI base but the searchbox dropdown has no total-results summary line "N резултата за търсене…", the Component UI exposes a count only in its modal variant, not the inline searchbox.
+- The pagefind Component UI doesn't provide Bulgarian strings, so visible labels are set at runtime via the instance API in `search-init.html`.
+
 ## Config
 
 Set the actual `baseURL` and `params.github` in `hugo.toml` before deploying.
