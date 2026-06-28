@@ -60,23 +60,29 @@ def join_key(text: str) -> str:
 def parse_examples(text: str) -> dict:
     """Return {join_key: [{"en": str, "bg": [str, ...]}, ...]}."""
     out: dict[str, list] = {}
-    current = None  # current example dict being filled
+    current = None  # current example pair being filled
     key = None
     for line in text.splitlines():
         m = EX_TERM_RE.match(line)
         if m:
             key = join_key(m.group(1))
-            current = {"en": "", "bg": []}
-            out.setdefault(key, []).append(current)
+            out.setdefault(key, [])
+            current = None
             continue
-        if current is None:
+        if key is None:
             continue
         m = EX_LINE_RE.match(line)
         if m:
             kind, val = m.group(1), m.group(2)
             if kind == "EN":
-                current["en"] = val
+                # Each EN line starts a new example pair, so terms with
+                # multiple EN/BG pairs render as separate examples.
+                current = {"en": val, "bg": []}
+                out[key].append(current)
             else:
+                if current is None:
+                    current = {"en": "", "bg": []}
+                    out[key].append(current)
                 current["bg"].append(val)
     # Drop empty shells.
     for k in list(out):
