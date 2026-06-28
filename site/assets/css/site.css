@@ -42,6 +42,11 @@
     color: #04121a;
 }
 
+/* Smooth transitions (SPA-like) */
+@media (prefers-reduced-motion: no-preference) {
+    @view-transition { navigation: auto; }
+}
+
 /* Sticky footer: header + a growing <main> + footer fill the viewport, so
    short pages (notably the home page) keep the footer pinned to the bottom
    without forcing an unnecessary vertical scroll. */
