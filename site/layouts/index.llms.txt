@@ -1,0 +1,11 @@
+# {{ site.Title }}
+
+> {{ site.Params.description }}
+
+{{ site.Params.description_suffix }} Всеки термин има отделна страница с превод, забележки и примери за употреба. По-долу е пълният индекс, групиран по първа буква; всяка препратка сочи към HTML страницата на термина.
+{{ range $letter := hugo.Data.terms.letters }}
+## {{ $letter }}
+{{ range where hugo.Data.terms.terms "letter" $letter }}
+- [{{ .en_raw }}]({{ printf "terms/%s/" .slug | absURL }}): {{ .bg_raw }}
+{{- end }}
+{{ end -}}

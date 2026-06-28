@@ -26,6 +26,15 @@ disableKinds = ["taxonomy", "term"]
   unsafe = true  # allow inline HTML in markdownified comments/examples
 
 [outputs]
-  home = ["HTML"]
+  home = ["HTML", "LLMS"]
   section = ["HTML"]
   page = ["HTML"]
+
+# llms.txt (llmstxt.org): a token-efficient Markdown index of every term,
+# emitted only on the home page -> public/llms.txt. isPlainText keeps Go from
+# HTML-escaping the Markdown; notAlternative keeps it out of rel=alternate.
+[outputFormats.llms]
+  mediaType = "text/plain"
+  baseName = "llms"
+  isPlainText = true
+  notAlternative = true

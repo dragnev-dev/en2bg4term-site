@@ -1,6 +1,6 @@
 # EN2BGTERM — Hugo site
 
-Static rebuild of the EN→BG IT-terminology dictionary. One crawlable page per term, per-page SEO + `DefinedTerm` JSON-LD, accessible bilingual markup, and full-text search  via [Pagefind](https://pagefind.app/).
+Static rebuild of the EN→BG IT-terminology dictionary. One crawlable page per term, per-page SEO + `DefinedTerm` JSON-LD, accessible bilingual markup, and full-text search via [Pagefind](https://pagefind.app/).
 
 ## Build
 
@@ -20,9 +20,11 @@ hugo server                    # local dev (handles baseURL; run build_data.py f
 3. **`npx pagefind --site public`** — builds the search index over the rendered term pages
    (`<article data-pagefind-body>`).
 
+Hugo also emits **`public/llms.txt`** ([llmstxt.org](https://llmstxt.org/)) — a token-efficient Markdown index of every term with absolute links, for agents looking up words. It's a custom output format (`[outputFormats.llms]` in `hugo.toml`) rendered by `layouts/index.llms.txt` on the home page only; kept out of `sitemap.xml` and `rel=alternate`.
+
 Serve `./public` over HTTP (Pagefind needs HTTP, not `file://`).
 
-## Data source (dev vs. prod)
+## Data source
 
 The parser reads its inputs from `$DICT_SRC` / `$EXAMPLES_SRC`
 
@@ -36,4 +38,4 @@ bash scripts/build.sh
 
 ## Config
 
-Set the real `baseURL` and `params.github` in `hugo.toml` before deploying.
+Set the actual `baseURL` and `params.github` in `hugo.toml` before deploying.
