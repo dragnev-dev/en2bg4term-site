@@ -136,12 +136,9 @@ a#main-title {
 .site-header:not(.is-home) .site-logo {
     width: min(300px, 70vw);
 }
-a#main-title:hover .site-logo,
-a#main-title:focus-visible .site-logo {
-    box-shadow:
-            0 0 0 1px var(--primary-dim),
-            0 0 40px rgba(70, 224, 242, 0.30),
-            0 0 80px rgba(227, 108, 245, 0.18);
+a#main-title:hover .site-logo {
+    filter: brightness(1.12) saturate(1.15);
+    transform: scale(1.02); /* optional — sells the "power-up" */
 }
 
 #sub-title {
