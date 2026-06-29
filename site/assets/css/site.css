@@ -30,6 +30,9 @@
     /* type */
     --font-body: 'Sofia Sans', sans-serif;             /* has Cyrillic */
     --font-display: 'Orbitron', 'Exo 2', sans-serif;   /* Latin only */
+
+    /* "box + arrow out" glyph for external links (MDN-style) */
+    --icon-external: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>');
 }
 
 * {
@@ -104,6 +107,23 @@ a:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
     border-radius: 2px;
+}
+
+/* Icon marking links that leave the site; It follows the link's colors */
+a.external::after {
+    content: "";
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    margin-inline-start: 0.15em;
+    vertical-align: middle;
+    background-color: currentColor;
+    -webkit-mask-image: var(--icon-external);
+    mask-image: var(--icon-external);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
 }
 
 /* ----- Global header: logo, slogan and search on every page ----- */
