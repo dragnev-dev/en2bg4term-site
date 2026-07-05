@@ -214,6 +214,17 @@ def main():
     ex_text = read_source(EXAMPLES_SRC)
     examples = parse_examples(ex_text)
     terms, letters = parse_dictionary(dict_text, examples)
+
+    # TEMPORARY: fill the POS-annotation gap and drop real duplicates until the
+    # source carries a marker on every same-word row. Strip by deleting
+    # scripts/patches.py — validate_collision_pos then enforces the source.
+    try:
+        import patches
+    except ImportError:
+        patches = None
+    if patches is not None:
+        patches.apply(terms)
+
     validate(terms, letters)
     validate_collision_pos(terms)
 

@@ -8,6 +8,8 @@ cd "$(dirname "$0")/.."
 
 echo "==> Testing parser"
 python3 scripts/test_build_data.py
+# Temporary patch layer (scripts/patches.py); for missing POS markers
+[ -f scripts/test_patches.py ] && python3 scripts/test_patches.py
 
 echo "==> Parsing source markdown -> data/terms.json"
 python3 scripts/build_data.py
