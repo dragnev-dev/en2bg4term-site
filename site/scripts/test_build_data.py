@@ -57,6 +57,36 @@ class TestSlugify(unittest.TestCase):
         self.assertEqual(b.slugify("（）"), "term")
 
 
+class TestPosFromMarker(unittest.TestCase):
+    def test_to_is_verb(self):
+        self.assertEqual(b.pos_from_marker("(to) map"), "verb")
+
+    def test_a_and_an_are_noun(self):
+        self.assertEqual(b.pos_from_marker("(a) map"), "noun")
+        self.assertEqual(b.pos_from_marker("(an) input"), "noun")
+
+    def test_adj_and_adv(self):
+        self.assertEqual(b.pos_from_marker("(adj) manual"), "adj")
+        self.assertEqual(b.pos_from_marker("(adv) inline"), "adv")
+
+    def test_case_insensitive(self):
+        self.assertEqual(b.pos_from_marker("(A) spooler"), "noun")
+
+    def test_to_be_still_verb(self):
+        self.assertEqual(b.pos_from_marker("(to be) informed"), "verb")
+
+    def test_marker_after_link(self):
+        # slugify already strips (to)/(a); pos must see through a leading link too.
+        self.assertEqual(b.pos_from_marker("(a) [stride](https://x.io)"), "noun")
+
+    def test_no_marker(self):
+        self.assertEqual(b.pos_from_marker("boundary"), "")
+
+    def test_non_pos_parenthetical_is_not_a_marker(self):
+        self.assertEqual(b.pos_from_marker("(variable) scope"), "")
+        self.assertEqual(b.pos_from_marker("resolution (gfx)"), "")
+
+
 class TestJoinKey(unittest.TestCase):
     def test_lowercase_and_collapse_whitespace(self):
         self.assertEqual(b.join_key("  Load   Balancer  "), "load balancer")
@@ -157,6 +187,51 @@ class TestParseDictionary(unittest.TestCase):
         terms, _ = b.parse_dictionary(DICT, examples)
         cache = next(t for t in terms if t["slug"] == "cache")
         self.assertEqual(cache["examples"], examples["cache"])
+
+    def test_pos_derived_from_marker(self):
+        access = next(t for t in self.terms if t["slug"] == "access")
+        self.assertEqual(access["en_md"], "(to) access")
+        self.assertEqual(access["pos"], "verb")
+        cache = next(t for t in self.terms if t["slug"] == "cache")
+        self.assertEqual(cache["pos"], "")  # unmarked
+
+
+# `map` collides (marked both ways); `boundary` is a lone unmarked row.
+POS_DICT_OK = """\
+### M
+
+EN | BG |
+-- | -- |
+(a) map | карта |
+(to) map | съпоставям |
+boundary | граница |
+"""
+
+# Same, plus a third bare `map` sense with no marker -> the collision gap.
+POS_DICT_GAP = POS_DICT_OK + "map | речник |\n"
+
+
+class TestCollisionPos(unittest.TestCase):
+    def test_collision_groups_only_returns_shared_slugs(self):
+        terms, _ = b.parse_dictionary(POS_DICT_OK, {})
+        groups = b.collision_groups(terms)
+        self.assertEqual(set(groups), {"map"})       # boundary is unique
+        self.assertEqual(len(groups["map"]), 2)
+
+    def test_lone_unmarked_row_is_allowed(self):
+        # `boundary` collides with nothing, so its missing pos must not fail.
+        terms, _ = b.parse_dictionary(POS_DICT_OK, {})
+        b.validate_collision_pos(terms)
+
+    def test_collision_row_without_pos_fails(self):
+        terms, _ = b.parse_dictionary(POS_DICT_GAP, {})
+        with self.assertRaises(b.ValidationError):
+            b.validate_collision_pos(terms)
+
+    def test_passes_once_every_collision_row_has_pos(self):
+        terms, _ = b.parse_dictionary(POS_DICT_GAP, {})
+        next(t for t in terms if t["en_raw"] == "map" and not t["pos"])["pos"] = "noun"
+        b.validate_collision_pos(terms)
 
 
 class TestValidate(unittest.TestCase):

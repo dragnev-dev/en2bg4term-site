@@ -21,6 +21,9 @@ OUT = SITE_DIR / "data" / "terms.json"
 
 LINK_RE = re.compile(r"\[([^\]]*)\]\((?:[^()]|\([^()]*\))*\)")  # [label](url) -> label; url may nest one level of parens (e.g. Wikipedia)
 PREFIX_RE = re.compile(r"^\((?:to|an|a)\)\s+", re.I)    # leading (to)/(an)/(a)
+# Leading POS marker -> part of speech
+POS_MARKER_RE = re.compile(r"^\(\s*(to|an|a|adj|adv)\b[^)]*\)", re.I)
+POS_BY_MARKER = {"to": "verb", "a": "noun", "an": "noun", "adj": "adj", "adv": "adv"}
 PAREN_RE = re.compile(r"\([^)]*\)")                     # parenthetical clarifiers
 SECTION_RE = re.compile(r"^###\s+(.+?)\s*$")            # dictionary letter header
 EX_SECTION_RE = re.compile(r"^##\s+(.+?)\s*$")          # examples letter header
@@ -56,6 +59,12 @@ def slugify(en_text: str) -> str:
     s = s.lower()
     s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
     return s or "term"
+
+
+def pos_from_marker(en_md: str) -> str:
+    """Leading POS marker ((to)/(a)/(an)/(adj)/(adv)) -> pos, else ''."""
+    m = POS_MARKER_RE.match(strip_links(en_md).strip())
+    return POS_BY_MARKER[m.group(1).lower()] if m else ""
 
 
 def join_key(text: str) -> str:
@@ -141,10 +150,19 @@ def parse_dictionary(text: str, examples: dict):
             "bg_raw": bg_raw,
             "bg_md": bg_md,
             "comment_md": comment_md,
+            "pos": pos_from_marker(en_md),
             "examples": examples.get(join_key(en_md), []),
         })
 
     return terms, letters
+
+
+def collision_groups(terms: list) -> dict:
+    """{base_slug: [term, ...]} for base slugs shared by more than one row."""
+    groups: dict[str, list] = {}
+    for t in terms:
+        groups.setdefault(slugify(t["en_md"]), []).append(t)
+    return {k: v for k, v in groups.items() if len(v) > 1}
 
 
 def validate(terms: list, letters: list) -> None:
@@ -176,12 +194,28 @@ def validate(terms: list, letters: list) -> None:
             "terms.json failed validation:\n  - " + "\n  - ".join(errors))
 
 
+def validate_collision_pos(terms: list) -> None:
+    """Fail the build if any same-word (slug-colliding) row lacks a POS.
+
+    Grouping senses onto one page per part of speech needs every colliding row
+    to declare its POS via a leading (to)/(a)/(an)/(adj)/(adv) marker
+    """
+    missing = [f"{base}: {t['en_raw']!r} / {t['bg_raw']!r}"
+               for base, rows in sorted(collision_groups(terms).items())
+               for t in rows if not t.get("pos")]
+    if missing:
+        raise ValidationError(
+            "same-word rows missing a POS marker "
+            "((to)/(a)/(an)/(adj)/(adv)):\n  - " + "\n  - ".join(missing))
+
+
 def main():
     dict_text = read_source(DICT_SRC)
     ex_text = read_source(EXAMPLES_SRC)
     examples = parse_examples(ex_text)
     terms, letters = parse_dictionary(dict_text, examples)
     validate(terms, letters)
+    validate_collision_pos(terms)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     payload = {"letters": letters, "terms": terms}
