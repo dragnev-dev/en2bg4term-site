@@ -24,6 +24,10 @@ PREFIX_RE = re.compile(r"^\((?:to|an|a)\)\s+", re.I)    # leading (to)/(an)/(a)
 # Leading POS marker -> part of speech
 POS_MARKER_RE = re.compile(r"^\(\s*(to|an|a|adj|adv)\b[^)]*\)", re.I)
 POS_BY_MARKER = {"to": "verb", "a": "noun", "an": "noun", "adj": "adj", "adv": "adv"}
+# Bulgarian display label per POS, and the order POS groups render on a page.
+POS_LABELS = {"noun": "Съществително име", "verb": "Глагол",
+              "adj": "Прилагателно име", "adv": "Наречие", "": ""}
+POS_ORDER = {"noun": 0, "verb": 1, "adj": 2, "adv": 3, "": 4}
 PAREN_RE = re.compile(r"\([^)]*\)")                     # parenthetical clarifiers
 SECTION_RE = re.compile(r"^###\s+(.+?)\s*$")            # dictionary letter header
 EX_SECTION_RE = re.compile(r"^##\s+(.+?)\s*$")          # examples letter header
@@ -65,6 +69,17 @@ def pos_from_marker(en_md: str) -> str:
     """Leading POS marker ((to)/(a)/(an)/(adj)/(adv)) -> pos, else ''."""
     m = POS_MARKER_RE.match(strip_links(en_md).strip())
     return POS_BY_MARKER[m.group(1).lower()] if m else ""
+
+
+def headword(en_md: str) -> str:
+    """Display headword for a consolidated page: the bare word, markers and
+    parentheticals removed (e.g. '(a) map' / 'resolution (gfx)' -> 'map' /
+    'resolution')."""
+    s = strip_links(en_md)
+    s = POS_MARKER_RE.sub("", s)     # leading (to)/(a)/(an)/(adj)/(adv)
+    s = PAREN_RE.sub("", s)          # any other parenthetical clarifier
+    s = re.sub(r"\s+", " ", s).strip()
+    return s or strip_links(en_md).strip()
 
 
 def join_key(text: str) -> str:
@@ -165,6 +180,61 @@ def collision_groups(terms: list) -> dict:
     return {k: v for k, v in groups.items() if len(v) > 1}
 
 
+def _sense(row: dict) -> dict:
+    """The per-row fields a single sense renders from."""
+    return {k: row[k] for k in
+            ("en_md", "bg_md", "bg_raw", "comment_md", "examples")}
+
+
+def merge_terms(rows: list) -> list:
+    """Collapse rows sharing a base slug into one page, senses grouped by POS.
+
+    Each page: {slug, letter, title, en_raw, bg_raw, multi, groups}, where
+    groups is [{pos, pos_label, senses:[...]}] ordered by POS_ORDER and senses
+    keep source order. `multi` marks a consolidated (>1 sense) page so the
+    template knows to show POS headings.
+    """
+    order: list[str] = []           # base slugs, first-appearance order
+    buckets: dict[str, list] = {}   # base slug -> rows
+    for r in rows:
+        base = slugify(r["en_md"])
+        if base not in buckets:
+            buckets[base] = []
+            order.append(base)
+        buckets[base].append(r)
+
+    pages = []
+    for base in order:
+        group_rows = buckets[base]
+        by_pos: dict[str, dict] = {}
+        for r in group_rows:
+            pos = r.get("pos", "")
+            g = by_pos.get(pos)
+            if g is None:
+                g = {"pos": pos, "pos_label": POS_LABELS.get(pos, ""),
+                     "senses": []}
+                by_pos[pos] = g
+            g["senses"].append(_sense(r))
+        groups = sorted(by_pos.values(),
+                        key=lambda g: POS_ORDER.get(g["pos"], 99))
+
+        multi = len(group_rows) > 1
+        first = group_rows[0]
+        # dict.fromkeys de-dups repeated glosses while keeping order.
+        bg_raw = "; ".join(dict.fromkeys(r["bg_raw"] for r in group_rows))
+        title = headword(first["en_md"]) if multi else first["en_raw"]
+        pages.append({
+            "slug": base,
+            "letter": first["letter"],
+            "title": title,
+            "en_raw": title,
+            "bg_raw": bg_raw,
+            "multi": multi,
+            "groups": groups,
+        })
+    return pages
+
+
 def validate(terms: list, letters: list) -> None:
     """Fail the build on data that would deploy broken pages.
 
@@ -213,7 +283,7 @@ def main():
     dict_text = read_source(DICT_SRC)
     ex_text = read_source(EXAMPLES_SRC)
     examples = parse_examples(ex_text)
-    terms, letters = parse_dictionary(dict_text, examples)
+    rows, letters = parse_dictionary(dict_text, examples)
 
     # TEMPORARY: fill the POS-annotation gap and drop real duplicates until the
     # source carries a marker on every same-word row. Strip by deleting
@@ -223,19 +293,23 @@ def main():
     except ImportError:
         patches = None
     if patches is not None:
-        patches.apply(terms)
+        patches.apply(rows)
 
+    # POS must be complete on colliding rows *before* we merge them by POS.
+    validate_collision_pos(rows)
+    terms = merge_terms(rows)
     validate(terms, letters)
-    validate_collision_pos(terms)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     payload = {"letters": letters, "terms": terms}
     OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
 
-    matched = sum(1 for t in terms if t["examples"])
-    print(f"terms: {len(terms)}  letters: {len(letters)}  with-examples: {matched}")
+    matched = sum(1 for r in rows if r["examples"])
+    consolidated = sum(1 for t in terms if t["multi"])
+    print(f"rows: {len(rows)}  pages: {len(terms)}  consolidated: {consolidated}  "
+          f"letters: {len(letters)}  with-examples: {matched}")
     print(f"example keys: {len(examples)}  unmatched: "
-          f"{len(examples) - len({join_key(t['en_md']) for t in terms if t['examples']})}")
+          f"{len(examples) - len({join_key(r['en_md']) for r in rows if r['examples']})}")
     print(f"wrote {OUT}")
 
 

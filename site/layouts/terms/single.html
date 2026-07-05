@@ -5,21 +5,60 @@
         <a href="{{ printf "terms/#letter-%s" (urlize .Params.letter) | relURL }}">{{ .Params.letter }}</a>
     </p>
 
-    <h1 class="term-en" lang="en">{{ .Params.en_md | markdownify }}</h1>
+    {{ if .Params.multi }}
+    {{/* Consolidated page: one headword, senses grouped by part of speech. */}}
+    <h1 class="term-en" lang="en">{{ .Params.en_raw }}</h1>
+
+    {{ range .Params.groups }}
+    <section class="pos-group"{{ with .pos_label }} aria-label="{{ . }}"{{ end }}>
+        {{ with .pos_label }}<h2 class="pos-label" lang="bg">{{ . }}</h2>{{ end }}
+        {{ range .senses }}
+        <div class="sense">
+            <h3 class="sense-en" lang="en">{{ .en_md | markdownify }}</h3>
+            <dl class="term-def">
+                <dt data-pagefind-ignore>Превод на български</dt>
+                <dd lang="bg">{{ .bg_md | markdownify }}</dd>
+            </dl>
+            {{ with .comment_md }}
+            <section class="term-comment" aria-label="Забележка">
+                <h4>Забележка</h4>
+                <div>{{ . | markdownify }}</div>
+            </section>
+            {{ end }}
+            {{ with .examples }}
+            <section class="term-examples" aria-label="Примери за употреба">
+                <h4>Примери за употреба</h4>
+                {{ range . }}
+                <div class="example">
+                    {{ with .en }}<p class="example-en" lang="en">{{ . | markdownify }}</p>{{ end }}
+                    {{ range .bg }}<p class="example-bg" lang="bg">{{ . | markdownify }}</p>{{ end }}
+                </div>
+                {{ end }}
+            </section>
+            {{ end }}
+        </div>
+        {{ end }}
+    </section>
+    {{ end }}
+
+    {{ else }}
+    {{/* Single-sense page: one-definition layout. */}}
+    {{ $s := index (index .Params.groups 0).senses 0 }}
+    <h1 class="term-en" lang="en">{{ $s.en_md | markdownify }}</h1>
 
     <dl class="term-def">
         <dt data-pagefind-ignore>Превод на български</dt>
-        <dd lang="bg">{{ .Params.bg_md | markdownify }}</dd>
+        <dd lang="bg">{{ $s.bg_md | markdownify }}</dd>
     </dl>
 
-    {{ with .Params.comment_md }}
+    {{ with $s.comment_md }}
     <section class="term-comment" aria-label="Забележка">
         <h2>Забележка</h2>
         <div>{{ . | markdownify }}</div>
     </section>
     {{ end }}
 
-    {{ with .Params.examples }}
+    {{ with $s.examples }}
     <section class="term-examples" aria-label="Примери за употреба">
         <h2>Примери за употреба</h2>
         {{ range . }}
@@ -29,6 +68,7 @@
         </div>
         {{ end }}
     </section>
+    {{ end }}
     {{ end }}
 
     {{ partial "term-jsonld.html" . }}

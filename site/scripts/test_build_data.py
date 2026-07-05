@@ -234,6 +234,86 @@ class TestCollisionPos(unittest.TestCase):
         b.validate_collision_pos(terms)
 
 
+class TestHeadword(unittest.TestCase):
+    def test_strips_leading_pos_marker(self):
+        self.assertEqual(b.headword("(a) map"), "map")
+        self.assertEqual(b.headword("(to) map"), "map")
+
+    def test_strips_leading_non_pos_parenthetical(self):
+        self.assertEqual(b.headword("(variable) scope"), "scope")
+
+    def test_strips_trailing_parenthetical(self):
+        self.assertEqual(b.headword("resolution (gfx)"), "resolution")
+
+    def test_strips_links(self):
+        self.assertEqual(b.headword("(a) [map](https://x.io)"), "map")
+
+    def test_plain_word_unchanged(self):
+        self.assertEqual(b.headword("mapping"), "mapping")
+
+    def test_collisions_share_one_headword(self):
+        # Every row of a slug-collision must yield the same headword.
+        rows, _ = b.parse_dictionary(POS_DICT_GAP, {})
+        maps = [b.headword(r["en_md"]) for r in rows if r["slug"].startswith("map")]
+        self.assertEqual(set(maps), {"map"})
+
+
+class TestMergeTerms(unittest.TestCase):
+    def setUp(self):
+        rows, _ = b.parse_dictionary(POS_DICT_GAP, {})
+        # Stamp the "bare" sense so the collision group is fully POS-marked.
+        next(r for r in rows if r["en_raw"] == "map" and not r["pos"])["pos"] = "noun"
+        self.pages = b.merge_terms(rows)
+
+    def _page(self, slug):
+        return next(p for p in self.pages if p["slug"] == slug)
+
+    def test_one_page_per_base_slug(self):
+        slugs = [p["slug"] for p in self.pages]
+        self.assertEqual(slugs.count("map"), 1)          # 3 rows -> 1 page
+        self.assertNotIn("map-2", slugs)                 # no suffixed slugs
+
+    def test_lone_row_is_single_sense(self):
+        boundary = self._page("boundary")
+        self.assertFalse(boundary["multi"])
+        self.assertEqual(boundary["en_raw"], "boundary")
+        self.assertEqual(len(boundary["groups"]), 1)
+        self.assertEqual(len(boundary["groups"][0]["senses"]), 1)
+
+    def test_collision_is_multi_and_grouped_by_pos(self):
+        m = self._page("map")
+        self.assertTrue(m["multi"])
+        self.assertEqual(m["en_raw"], "map")             # headword, no marker
+        by_pos = {g["pos"]: g for g in m["groups"]}
+        self.assertEqual(set(by_pos), {"noun", "verb"})
+        self.assertEqual(len(by_pos["noun"]["senses"]), 2)   # (a) map + bare map
+        self.assertEqual(len(by_pos["verb"]["senses"]), 1)   # (to) map
+
+    def test_groups_ordered_noun_before_verb(self):
+        m = self._page("map")
+        self.assertEqual([g["pos"] for g in m["groups"]], ["noun", "verb"])
+
+    def test_group_carries_bulgarian_label(self):
+        m = self._page("map")
+        labels = {g["pos"]: g["pos_label"] for g in m["groups"]}
+        self.assertEqual(labels["noun"], b.POS_LABELS["noun"])
+
+    def test_sense_keeps_render_fields(self):
+        sense = self._page("map")["groups"][0]["senses"][0]
+        self.assertEqual(set(sense),
+                         {"en_md", "bg_md", "bg_raw", "comment_md", "examples"})
+
+    def test_bg_raw_summary_joins_senses(self):
+        # карта + речка(съпоставям) + речник, deduped and ordered.
+        self.assertEqual(self._page("map")["bg_raw"],
+                         "карта; съпоставям; речник")
+
+    def test_merged_pages_pass_validate(self):
+        # Merged output must satisfy the deploy-blocking invariants.
+        _, letters = b.parse_dictionary(POS_DICT_GAP, {})
+        b.validate(self.pages, letters)
+
+
 class TestValidate(unittest.TestCase):
     def _term(self, **kw):
         base = {"slug": "x", "en_raw": "x", "bg_raw": "у"}

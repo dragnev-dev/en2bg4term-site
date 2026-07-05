@@ -413,7 +413,8 @@ h1.term-en {
     background: linear-gradient(90deg, var(--primary), var(--accent), transparent 85%);
     opacity: 0.7;
 }
-.term-comment h2, .term-examples h2 {
+.term-comment h2, .term-examples h2,
+.term-comment h4, .term-examples h4 {
     font-family: var(--font-body);
     font-size: 13px;
     font-weight: 700;
@@ -424,6 +425,35 @@ h1.term-en {
 }
 .term-comment {
     line-height: 1.6;
+}
+
+/* ----- Consolidated (multi-sense) term pages ----- */
+.pos-group {
+    margin-top: 34px;
+}
+.pos-label {
+    font-family: var(--font-display);
+    font-size: clamp(18px, 3.5vw, 24px);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    margin: 0 0 4px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+}
+.sense {
+    margin-top: 20px;
+}
+.sense-en {
+    font-family: var(--font-display);
+    font-size: clamp(20px, 4vw, 26px);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--foreground);
+    margin: 0 0 6px;
+}
+.sense .term-def dd {
+    margin-bottom: 12px;
 }
 
 .example {
